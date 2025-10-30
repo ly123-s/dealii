@@ -64,10 +64,16 @@ namespace MPM
 
     /**
      * Initialize the MPM handler with a triangulation and mapping.
+     *
+     * @param tria The triangulation representing the background grid.
+     * @param mapping The mapping used to transform between reference and
+     * real cells.
+     * @param n_properties The number of properties each material point stores.
      */
     void
     initialize(const Triangulation<dim, spacedim> &tria,
-               const Mapping<dim, spacedim>       &mapping);
+               const Mapping<dim, spacedim>       &mapping,
+               const unsigned int                  n_properties = 0);
 
     /**
      * Transfer mass and momentum from material points to grid nodes.
@@ -127,6 +133,13 @@ namespace MPM
     insert_particle(const Point<spacedim>           &position,
                     const std::vector<double>       &properties,
                     const types::particle_index      id);
+
+    /**
+     * Update internal data structures after particle insertions.
+     * This should be called after a series of insert_particle calls.
+     */
+    void
+    update_cached_numbers();
 
     /**
      * Clear all material points.

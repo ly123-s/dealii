@@ -12,6 +12,8 @@
 //
 // ------------------------------------------------------------------------
 
+#include <deal.II/grid/grid_tools.h>
+
 #include <deal.II/mpm/mpm_handler.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -42,11 +44,12 @@ namespace MPM
   void
   MPMHandler<dim, spacedim>::initialize(
     const Triangulation<dim, spacedim> &tria,
-    const Mapping<dim, spacedim>       &map)
+    const Mapping<dim, spacedim>       &map,
+    const unsigned int                  n_properties)
   {
     triangulation = &tria;
     mapping       = &map;
-    particle_handler.initialize(tria, map, 0);
+    particle_handler.initialize(tria, map, n_properties);
   }
 
 
@@ -138,8 +141,33 @@ namespace MPM
     const std::vector<double>  &properties,
     const types::particle_index id)
   {
-    // Insert particle using the underlying particle handler
-    particle_handler.insert_particle(position, properties, id);
+    // Find the cell containing the particle position
+    auto cell = GridTools::find_active_cell_around_point(*mapping,
+                                                          *triangulation,
+                                                          position);
+    
+    // Create a new particle
+    Particles::Particle<dim, spacedim> new_particle;
+    new_particle.set_location(position);
+    new_particle.set_reference_location(
+      mapping->transform_real_to_unit_cell(cell, position));
+    new_particle.set_id(id);
+    
+    // Set properties if provided
+    if (properties.size() > 0)
+      new_particle.set_properties(properties);
+    
+    // Insert the particle
+    particle_handler.insert_particle(new_particle, cell);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  MPMHandler<dim, spacedim>::update_cached_numbers()
+  {
+    particle_handler.update_cached_numbers();
   }
 
 

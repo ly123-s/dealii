@@ -84,8 +84,10 @@ template <int dim>
 void
 MPMExample<dim>::initialize_material_points()
 {
-  // Initialize the MPM handler
-  mpm_handler.initialize(triangulation, mapping);
+  // Initialize the MPM handler with properties
+  // Properties: mass, volume, velocities (dim components)
+  const unsigned int n_properties = 2 + dim;
+  mpm_handler.initialize(triangulation, mapping, n_properties);
 
   // Create a regular grid of material points in the domain
   const unsigned int n_particles_per_direction = 4;
@@ -134,6 +136,9 @@ MPMExample<dim>::initialize_material_points()
               mpm_handler.insert_particle(position, properties, particle_id++);
             }
     }
+
+  // Update cached particle data
+  mpm_handler.update_cached_numbers();
 
   std::cout << "Number of material points: "
             << mpm_handler.n_global_particles() << std::endl;
