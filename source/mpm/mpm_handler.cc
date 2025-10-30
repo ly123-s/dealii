@@ -145,18 +145,18 @@ namespace MPM
     auto cell = GridTools::find_active_cell_around_point(*mapping,
                                                           *triangulation,
                                                           position);
-    
+
     // Create a new particle
     Particles::Particle<dim, spacedim> new_particle;
     new_particle.set_location(position);
     new_particle.set_reference_location(
       mapping->transform_real_to_unit_cell(cell, position));
     new_particle.set_id(id);
-    
+
     // Set properties if provided
-    if (properties.size() > 0)
+    if (!properties.empty())
       new_particle.set_properties(properties);
-    
+
     // Insert the particle
     particle_handler.insert_particle(new_particle, cell);
   }
