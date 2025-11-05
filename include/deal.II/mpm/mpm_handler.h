@@ -17,9 +17,15 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/dofs/dof_handler.h>
+
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/tria.h>
+
+#include <deal.II/lac/vector.h>
 
 #include <deal.II/mpm/material_point.h>
 
@@ -74,6 +80,15 @@ namespace MPM
     initialize(const Triangulation<dim, spacedim> &tria,
                const Mapping<dim, spacedim>       &mapping,
                const unsigned int                  n_properties = 0);
+
+    /**
+     * Set up the finite element and DoF handler for grid operations.
+     * This is required before using particle_to_grid and grid_to_particle.
+     *
+     * @param fe The finite element to use for the background grid.
+     */
+    void
+    setup_background_dofs(const FiniteElement<dim, spacedim> &fe);
 
     /**
      * Transfer mass and momentum from material points to grid nodes.
@@ -152,6 +167,16 @@ namespace MPM
      * Underlying particle handler for storing material points.
      */
     Particles::ParticleHandler<dim, spacedim> particle_handler;
+
+    /**
+     * DoF handler for the background grid.
+     */
+    DoFHandler<dim, spacedim> dof_handler;
+
+    /**
+     * Pointer to the finite element.
+     */
+    SmartPointer<const FiniteElement<dim, spacedim>> fe;
 
     /**
      * Pointer to the triangulation.
