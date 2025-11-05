@@ -1,0 +1,29 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// ------------------------------------------------------------------------
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    template class MPM::MPMHandler<deal_II_dimension, deal_II_space_dimension>;
+#endif
+  }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; VectorType : REAL_VECTOR_TYPES)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    template void MPM::MPMHandler<deal_II_dimension, deal_II_space_dimension>::
+      particle_to_grid<VectorType>(VectorType &, VectorType &) const;
+
+    template void MPM::MPMHandler<deal_II_dimension, deal_II_space_dimension>::
+      compute_grid_forces<VectorType>(VectorType &) const;
+
+    template void MPM::MPMHandler<deal_II_dimension, deal_II_space_dimension>::
+      grid_to_particle<VectorType>(const VectorType &, const double);
+#endif
+  }
